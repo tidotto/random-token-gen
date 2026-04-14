@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Tokens Autônomo</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+
+        main {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #64748b;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .token-display {
+            background-color: #f1f5f9;
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            font-family: monospace;
+            font-size: 1.1rem;
+            word-break: break-all;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 2px dashed #cbd5e1;
+        }
+
+        .token-display:hover {
+            background-color: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        button {
+            margin-top: 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #10b981;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Gerador de Tokens</h1>
+        <p>Clique em cima do token para copiar</p>
+        
+        <div class="token-display" id="tokenDisplay" onclick="copiarToken()">
+            Carregando...
+        </div>
+        
+        <button onclick="gerarEExibirToken()">Gerar Novo Token</button>
+    </main>
+
+    <div id="toast" class="toast">Token copiado!</div>
+
+    <script>
+        function gerarToken() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            const prefixo = 'cc_';
+            const tamanho = 43;
+            
+            let token = '';
+            const randomValues = new Uint8Array(tamanho);
+            window.crypto.getRandomValues(randomValues);
+            
+            for (let i = 0; i < tamanho; i++) {
+                token += caracteres[randomValues[i] % caracteres.length];
+            }
+            
+            return prefixo + token;
+        }
+
+        function gerarEExibirToken() {
+            const display = document.getElementById('tokenDisplay');
+            display.textContent = gerarToken();
+        }
+
+        function copiarToken() {
+            const tokenText = document.getElementById('tokenDisplay').textContent;
+            navigator.clipboard.writeText(tokenText).then(() => {
+                mostrarToast();
+            });
+        }
+
+        function mostrarToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // Inicia com um token já gerado
+        window.onload = gerarEExibirToken;
+    </script>
+</body>
+</html>
